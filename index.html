@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RICE Scoring - Backlog Prioritization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        input[type="number"] {
+            text-align: center;
+        }
+        
+        .score-cell {
+            font-weight: 700;
+            font-size: 16px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        
+        .add-row {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .add-row:hover {
+            background: #2980b9;
+        }
+        
+        .reference {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .reference h3 {
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .reference-item {
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+        }
+        
+        .reference-item strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RICE Scoring - Backlog Prioritization</h1>
+        <p class="subtitle">Score each item 1-10 | Formula: (Reach × Impact × Confidence) / Effort</p>
+        
+        <table id="riceTable">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Feature/Item</th>
+                    <th style="width: 10%">Reach<br><small>(1-10)</small></th>
+                    <th style="width: 10%">Impact<br><small>(1-10)</small></th>
+                    <th style="width: 12%">Confidence<br><small>(1-10)</small></th>
+                    <th style="width: 10%">Effort<br><small>(1-10)</small></th>
+                    <th style="width: 10%">RICE Score</th>
+                    <th style="width: 8%"></th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td><input type="text" placeholder="Enter feature or item"></td>
+                    <td><input type="number" min="1" max="10" class="reach" oninput="calculateScore(this)"></td>
+                    <td><input type="number" min="1" max="10" class="impact" oninput="calculateScore(this)"></td>
+                    <td><input type="number" min="1" max="10" class="confidence" oninput="calculateScore(this)"></td>
+                    <td><input type="number" min="1" max="10" class="effort" oninput="calculateScore(this)"></td>
+                    <td class="score-cell">-</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <button class="add-row" onclick="addRow()">+ Add Item</button>
+        
+        <div class="reference">
+            <h3>Quick Reference Guide (1-10 scale)</h3>
+            <div class="reference-grid">
+                <div class="reference-item">
+                    <strong>Reach</strong>
+                    10 = Everyone<br>
+                    7-9 = Most users<br>
+                    4-6 = Half of users<br>
+                    1-3 = Small segment
+                </div>
+                <div class="reference-item">
+                    <strong>Impact</strong>
+                    10 = Game changing<br>
+                    7-9 = Major improvement<br>
+                    4-6 = Solid improvement<br>
+                    1-3 = Minor polish
+                </div>
+                <div class="reference-item">
+                    <strong>Confidence</strong>
+                    10 = Prototyped already<br>
+                    7-9 = Very confident<br>
+                    4-6 = Some unknowns<br>
+                    1-3 = Major unknowns
+                </div>
+                <div class="reference-item">
+                    <strong>Effort</strong>
+                    10 = 3+ months<br>
+                    7-9 = 1-2 months<br>
+                    4-6 = 2-4 weeks<br>
+                    1-3 = Days to a week
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateScore(input) {
+            const row = input.closest('tr');
+            const reach = parseFloat(row.querySelector('.reach').value) || 0;
+            const impact = parseFloat(row.querySelector('.impact').value) || 0;
+            const confidence = parseFloat(row.querySelector('.confidence').value) || 0;
+            const effort = parseFloat(row.querySelector('.effort').value) || 0;
+            
+            const scoreCell = row.querySelector('.score-cell');
+            
+            if (reach && impact && confidence && effort) {
+                const score = (reach * impact * confidence) / effort;
+                scoreCell.textContent = score.toFixed(1);
+                scoreCell.style.background = getScoreColor(score);
+            } else {
+                scoreCell.textContent = '-';
+                scoreCell.style.background = 'transparent';
+            }
+            
+            sortTable();
+        }
+        
+        function getScoreColor(score) {
+            if (score >= 100) return '#27ae60';
+            if (score >= 50) return '#f39c12';
+            return '#e74c3c';
+        }
+        
+        function addRow() {
+            const tbody = document.getElementById('tableBody');
+            const newRow = tbody.rows[0].cloneNode(true);
+            
+            // Clear inputs
+            newRow.querySelectorAll('input').forEach(input => {
+                input.value = '';
+            });
+            newRow.querySelector('.score-cell').textContent = '-';
+            newRow.querySelector('.score-cell').style.background = 'transparent';
+            
+            tbody.appendChild(newRow);
+        }
+        
+        function deleteRow(btn) {
+            const tbody = document.getElementById('tableBody');
+            if (tbody.rows.length > 1) {
+                btn.closest('tr').remove();
+            } else {
+                alert('Cannot delete the last row');
+            }
+        }
+        
+        function sortTable() {
+            const tbody = document.getElementById('tableBody');
+            const rows = Array.from(tbody.rows);
+            
+            rows.sort((a, b) => {
+                const scoreA = parseFloat(a.querySelector('.score-cell').textContent) || 0;
+                const scoreB = parseFloat(b.querySelector('.score-cell').textContent) || 0;
+                return scoreB - scoreA;
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+    </script>
+</body>
+</html>
