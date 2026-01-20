@@ -142,16 +142,16 @@
 <body>
     <div class="container">
         <h1>RICE Scoring - Backlog Prioritization</h1>
-        <p class="subtitle">Score each item 1-10 | Formula: (Reach × Impact × Confidence) / Effort | Max score: 100</p>
+        <p class="subtitle">Score each item 0-10 | Formula: (Reach × Impact × Confidence) / Effort | Max score: 100</p>
         
         <table id="riceTable">
             <thead>
                 <tr>
                     <th style="width: 25%">Feature/Item</th>
-                    <th style="width: 10%">Reach<br><small>(1-10)</small></th>
-                    <th style="width: 10%">Impact<br><small>(1-10)</small></th>
-                    <th style="width: 12%">Confidence<br><small>(1-10)</small></th>
-                    <th style="width: 10%">Effort<br><small>(1-10)</small></th>
+                    <th style="width: 10%">Reach<br><small>(0-10)</small></th>
+                    <th style="width: 10%">Impact<br><small>(0-10)</small></th>
+                    <th style="width: 12%">Confidence<br><small>(0-10)</small></th>
+                    <th style="width: 10%">Effort<br><small>(0-10)</small></th>
                     <th style="width: 10%">RICE Score</th>
                     <th style="width: 8%"></th>
                 </tr>
@@ -159,10 +159,10 @@
             <tbody id="tableBody">
                 <tr>
                     <td><input type="text" placeholder="Enter feature or item"></td>
-                    <td><input type="number" min="1" max="10" class="reach" oninput="calculateScore(this); handleAutoAdvance(this)"></td>
-                    <td><input type="number" min="1" max="10" class="impact" oninput="calculateScore(this); handleAutoAdvance(this)"></td>
-                    <td><input type="number" min="1" max="10" class="confidence" oninput="calculateScore(this); handleAutoAdvance(this)"></td>
-                    <td><input type="number" min="1" max="10" class="effort" oninput="calculateScore(this); handleAutoAdvance(this)"></td>
+                    <td><input type="number" min="0" max="10" class="reach" oninput="validateInput(this); calculateScore(this); handleAutoAdvance(this)"></td>
+                    <td><input type="number" min="0" max="10" class="impact" oninput="validateInput(this); calculateScore(this); handleAutoAdvance(this)"></td>
+                    <td><input type="number" min="0" max="10" class="confidence" oninput="validateInput(this); calculateScore(this); handleAutoAdvance(this)"></td>
+                    <td><input type="number" min="0" max="10" class="effort" oninput="validateInput(this); calculateScore(this); handleAutoAdvance(this)"></td>
                     <td class="score-cell">-</td>
                     <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
                 </tr>
@@ -172,35 +172,39 @@
         <button class="add-row" onclick="addRow()">+ Add Item</button>
         
         <div class="reference">
-            <h3>Quick Reference Guide (1-10 scale)</h3>
+            <h3>Quick Reference Guide (0-10 scale)</h3>
             <div class="reference-grid">
                 <div class="reference-item">
                     <strong>Reach</strong>
                     10 = Everyone<br>
                     7-9 = Most users<br>
                     4-6 = Half of users<br>
-                    1-3 = Small segment
+                    1-3 = Small segment<br>
+                    0 = No users
                 </div>
                 <div class="reference-item">
                     <strong>Impact</strong>
                     10 = Game changing<br>
                     7-9 = Major improvement<br>
                     4-6 = Solid improvement<br>
-                    1-3 = Minor polish
+                    1-3 = Minor polish<br>
+                    0 = No impact
                 </div>
                 <div class="reference-item">
                     <strong>Confidence</strong>
                     10 = Prototyped already<br>
                     7-9 = Very confident<br>
                     4-6 = Some unknowns<br>
-                    1-3 = Major unknowns
+                    1-3 = Major unknowns<br>
+                    0 = No confidence
                 </div>
                 <div class="reference-item">
                     <strong>Effort</strong>
                     10 = 3+ months<br>
                     7-9 = 1-2 months<br>
                     4-6 = 2-4 weeks<br>
-                    1-3 = Days to a week
+                    1-3 = Days to a week<br>
+                    0 = No effort
                 </div>
             </div>
         </div>
@@ -224,6 +228,17 @@
             } else {
                 scoreCell.textContent = '-';
                 scoreCell.style.background = 'transparent';
+            }
+        }
+        
+        function validateInput(input) {
+            let value = parseInt(input.value);
+            
+            // If value is outside 0-10 range, constrain it
+            if (value > 10) {
+                input.value = 10;
+            } else if (value < 0 || isNaN(value)) {
+                input.value = '';
             }
         }
         
