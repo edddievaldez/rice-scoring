@@ -159,10 +159,10 @@
             <tbody id="tableBody">
                 <tr>
                     <td><input type="text" placeholder="Enter feature or item"></td>
-                    <td><input type="number" min="1" max="10" class="reach" oninput="calculateScore(this)"></td>
-                    <td><input type="number" min="1" max="10" class="impact" oninput="calculateScore(this)"></td>
-                    <td><input type="number" min="1" max="10" class="confidence" oninput="calculateScore(this)"></td>
-                    <td><input type="number" min="1" max="10" class="effort" oninput="calculateScore(this)"></td>
+                    <td><input type="number" min="1" max="10" class="reach" oninput="calculateScore(this); handleAutoAdvance(this)"></td>
+                    <td><input type="number" min="1" max="10" class="impact" oninput="calculateScore(this); handleAutoAdvance(this)"></td>
+                    <td><input type="number" min="1" max="10" class="confidence" oninput="calculateScore(this); handleAutoAdvance(this)"></td>
+                    <td><input type="number" min="1" max="10" class="effort" oninput="calculateScore(this); handleAutoAdvance(this)"></td>
                     <td class="score-cell">-</td>
                     <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
                 </tr>
@@ -226,6 +226,20 @@
             }
             
             sortTable();
+        }
+        
+        function handleAutoAdvance(input) {
+            // Only auto-advance if user typed 2 digits (value is 10 or has 2 characters)
+            if (input.value.length === 2) {
+                const inputs = Array.from(input.closest('tr').querySelectorAll('input[type="number"]'));
+                const currentIndex = inputs.indexOf(input);
+                
+                // Move to next number input if it exists
+                if (currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                    inputs[currentIndex + 1].select();
+                }
+            }
         }
         
         function getScoreColor(score) {
