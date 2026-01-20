@@ -220,12 +220,11 @@
                 const score = Math.min(100, (reach * impact * confidence) / effort);
                 scoreCell.textContent = score.toFixed(1);
                 scoreCell.style.background = getScoreColor(score);
+                sortTable(input); // Pass the input to preserve focus
             } else {
                 scoreCell.textContent = '-';
                 scoreCell.style.background = 'transparent';
             }
-            
-            sortTable();
         }
         
         function handleAutoAdvance(input) {
@@ -271,9 +270,19 @@
             }
         }
         
-        function sortTable() {
+        function sortTable(activeInput) {
             const tbody = document.getElementById('tableBody');
             const rows = Array.from(tbody.rows);
+            
+            // Store which input was focused and its class
+            let focusClass = null;
+            let focusRowIndex = null;
+            
+            if (activeInput) {
+                focusClass = activeInput.className;
+                const activeRow = activeInput.closest('tr');
+                focusRowIndex = rows.indexOf(activeRow);
+            }
             
             rows.sort((a, b) => {
                 const scoreA = parseFloat(a.querySelector('.score-cell').textContent) || 0;
@@ -282,6 +291,20 @@
             });
             
             rows.forEach(row => tbody.appendChild(row));
+            
+            // Restore focus to the same input field
+            if (activeInput && focusClass) {
+                const newRows = Array.from(tbody.rows);
+                const originalRow = rows[focusRowIndex];
+                const newIndex = newRows.indexOf(originalRow);
+                const inputToFocus = newRows[newIndex].querySelector('.' + focusClass);
+                
+                if (inputToFocus) {
+                    inputToFocus.focus();
+                    // Move cursor to end of input
+                    inputToFocus.setSelectionRange(inputToFocus.value.length, inputToFocus.value.length);
+                }
+            }
         }
     </script>
 </body>
